@@ -45,7 +45,7 @@ int ecu_write_to_csv(void){
         printf("Error opening CSV file");
         return 1;
     }
-//    fprintf(fptr,"%.2f \n", myECU.throttle); //Broke it fix it later
+   fprintf(fptr,"%.2f \n", myECU.RPM, myECU.bat_volt, myECU.throttle, myECU.man_pres, myECU.cool_pres); //Broke it fix it later
 
     fclose(fptr);
     return 0;
@@ -76,7 +76,7 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
      
     if(iter_num == PRINT_AFTER){
         iter_num = 0;
-            printf("\n Throttle: %u",myECU.throttle); 
+            printf("\nRPM: %u Throttle: %u \n Battery: %f",myECU.RPM,  myECU.throttle, myECU.bat_volt); 
 	system("clear");
         //if(ecu_write_to_csv()){
          //   printf("Write operation failed");
