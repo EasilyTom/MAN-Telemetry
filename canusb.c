@@ -449,10 +449,11 @@ static void dump_data_frames(int tty_fd)
         //for (i = frame_len - 2; i > 3; i--) {
         //  printf("%02x ", frame[i]);
         //} // Right now we would like to see the data frame for debugging
+
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
-        //printf("\n");
-	tcflush(tty_fd, TCIFLUSH);
+        
+	      tcflush(tty_fd, TCIFLUSH);
       } else {
         /*printf("Unknown: ");
         for (i = 0; i <= frame_len; i++) {
@@ -569,23 +570,23 @@ int main(int argc, char *argv[])
       baudrate = atoi(optarg);
       break;
 
-    case 'i':
+    case 'i':           // Not needed
       inject_id = optarg;
       break;
 
-    case 'j':
+    case 'j':           // Not needed
       inject_data = optarg;
       break;
 
-    case 'n':
+    case 'n':           // Not needed
       terminate_after = atoi(optarg);
       break;
 
-    case 'g':
+    case 'g':           // Not needed
       inject_sleep_gap = strtof(optarg, NULL);
       break;
 
-    case 'm':
+    case 'm':           // Not needed
       inject_payload_mode = atoi(optarg);
       break;
 
