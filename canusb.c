@@ -263,7 +263,7 @@ static int command_settings(int tty_fd, CANUSB_SPEED speed, CANUSB_MODE mode, CA
 }
 
 
-
+//This one is not really needed
 static int send_data_frame(int tty_fd, CANUSB_FRAME frame, unsigned char id_lsb, unsigned char id_msb, unsigned char data[], int data_length_code)
 {
 #define MAX_FRAME_SIZE 13
@@ -311,112 +311,113 @@ static int send_data_frame(int tty_fd, CANUSB_FRAME frame, unsigned char id_lsb,
 }
 
 
-
-static int hex_value(int c)
-{
-  if (c >= 0x30 && c <= 0x39) /* '0' - '9' */
-    return c - 0x30;
-  else if (c >= 0x41 && c <= 0x46) /* 'A' - 'F' */
-    return (c - 0x41) + 10;
-  else if (c >= 0x61 && c <= 0x66) /* 'a' - 'f' */
-    return (c - 0x61) + 10;
-  else
-    return -1;
-}
-
-
-
-static int convert_from_hex(const char *hex_string, unsigned char *bin_string, int bin_string_len)
-{
-  int n1, n2, high;
-
-  high = -1;
-  n1 = n2 = 0;
-  while (hex_string[n1] != '\0') {
-    if (hex_value(hex_string[n1]) >= 0) {
-      if (high == -1) {
-        high = hex_string[n1];
-      } else {
-        bin_string[n2] = hex_value(high) * 16 + hex_value(hex_string[n1]);
-        n2++;
-        if (n2 >= bin_string_len) {
-          printf("hex string truncated to %d bytes\n", n2);
-          break;
-        }
-        high = -1;
-      }
-    }
-    n1++;
-  }
-
-  return n2;
-}
+// // Probably not needed
+// static int hex_value(int c)
+// {
+//   if (c >= 0x30 && c <= 0x39) /* '0' - '9' */
+//     return c - 0x30;
+//   else if (c >= 0x41 && c <= 0x46) /* 'A' - 'F' */
+//     return (c - 0x41) + 10;
+//   else if (c >= 0x61 && c <= 0x66) /* 'a' - 'f' */
+//     return (c - 0x61) + 10;
+//   else
+//     return -1;
+// }
 
 
+// Not needed
+// static int convert_from_hex(const char *hex_string, unsigned char *bin_string, int bin_string_len)
+// {
+//   int n1, n2, high;
 
-static int inject_data_frame(int tty_fd, const char *hex_id, const char *hex_data)
-{
-  int data_len;
-  unsigned char binary_data[8];
-  unsigned char binary_id_lsb = 0, binary_id_msb = 0;
-  struct timespec gap_ts;
-  struct timeval now;
-  int error = 0;
+//   high = -1;
+//   n1 = n2 = 0;
+//   while (hex_string[n1] != '\0') {
+//     if (hex_value(hex_string[n1]) >= 0) {
+//       if (high == -1) {
+//         high = hex_string[n1];
+//       } else {
+//         bin_string[n2] = hex_value(high) * 16 + hex_value(hex_string[n1]);
+//         n2++;
+//         if (n2 >= bin_string_len) {
+//           printf("hex string truncated to %d bytes\n", n2);
+//           break;
+//         }
+//         high = -1;
+//       }
+//     }
+//     n1++;
+//   }
 
-  gap_ts.tv_sec = inject_sleep_gap / 1000;
-  gap_ts.tv_nsec = (long)(((long long)(inject_sleep_gap * 1000000)) % 1000000000LL);
+//   return n2;
+// }
 
-  /* Set seed value for pseudo random numbers. */
-  gettimeofday(&now, NULL);
-  srandom(now.tv_usec);
 
-  data_len = convert_from_hex(hex_data, binary_data, sizeof(binary_data));
-  if (data_len == 0) {
-    fprintf(stderr, "Unable to convert data from hex to binary!\n");
-    return -1;
-  }
+// Not needed 
 
-  switch (strlen(hex_id)) {
-  case 1:
-    binary_id_lsb = hex_value(hex_id[0]);
-    break;
+// static int inject_data_frame(int tty_fd, const char *hex_id, const char *hex_data)
+// {
+//   int data_len;
+//   unsigned char binary_data[8];
+//   unsigned char binary_id_lsb = 0, binary_id_msb = 0;
+//   struct timespec gap_ts;
+//   struct timeval now;
+//   int error = 0;
 
-  case 2:
-    binary_id_lsb = (hex_value(hex_id[0]) * 16) + hex_value(hex_id[1]);
-    break;
+//   gap_ts.tv_sec = inject_sleep_gap / 1000;
+//   gap_ts.tv_nsec = (long)(((long long)(inject_sleep_gap * 1000000)) % 1000000000LL);
 
-  case 3:
-    binary_id_msb = hex_value(hex_id[0]);
-    binary_id_lsb = (hex_value(hex_id[1]) * 16) + hex_value(hex_id[2]);
-    break;
+//   /* Set seed value for pseudo random numbers. */
+//   gettimeofday(&now, NULL);
+//   srandom(now.tv_usec);
 
-  default:
-    fprintf(stderr, "Unable to convert ID from hex to binary!\n");
-    return -1;
-  }
+//   data_len = convert_from_hex(hex_data, binary_data, sizeof(binary_data));
+//   if (data_len == 0) {
+//     fprintf(stderr, "Unable to convert data from hex to binary!\n");
+//     return -1;
+//   }
 
-  while (program_running && ! error) {
-    if (gap_ts.tv_sec || gap_ts.tv_nsec)
-      nanosleep(&gap_ts, NULL);
+//   switch (strlen(hex_id)) {
+//   case 1:
+//     binary_id_lsb = hex_value(hex_id[0]);
+//     break;
 
-    if (terminate_after && (--terminate_after == 0))
-      program_running = 0;
+//   case 2:
+//     binary_id_lsb = (hex_value(hex_id[0]) * 16) + hex_value(hex_id[1]);
+//     break;
 
-    if (inject_payload_mode == CANUSB_INJECT_PAYLOAD_MODE_RANDOM) {
-      int i;
-      for (i = 0; i < data_len; i++)
-        binary_data[i] = random();
-    } else if (inject_payload_mode == CANUSB_INJECT_PAYLOAD_MODE_INCREMENTAL) {
-      int i;
-      for (i = 0; i < data_len; i++)
-        binary_data[i]++;
-    }
+//   case 3:
+//     binary_id_msb = hex_value(hex_id[0]);
+//     binary_id_lsb = (hex_value(hex_id[1]) * 16) + hex_value(hex_id[2]);
+//     break;
 
-    error = send_data_frame(tty_fd, CANUSB_FRAME_STANDARD, binary_id_lsb, binary_id_msb, binary_data, data_len);
-  }
+//   default:
+//     fprintf(stderr, "Unable to convert ID from hex to binary!\n");
+//     return -1;
+//   }
 
-  return error;
-}
+//   while (program_running && ! error) {
+//     if (gap_ts.tv_sec || gap_ts.tv_nsec)
+//       nanosleep(&gap_ts, NULL);
+
+//     if (terminate_after && (--terminate_after == 0))
+//       program_running = 0;
+
+//     if (inject_payload_mode == CANUSB_INJECT_PAYLOAD_MODE_RANDOM) {
+//       int i;
+//       for (i = 0; i < data_len; i++)
+//         binary_data[i] = random();
+//     } else if (inject_payload_mode == CANUSB_INJECT_PAYLOAD_MODE_INCREMENTAL) {
+//       int i;
+//       for (i = 0; i < data_len; i++)
+//         binary_data[i]++;
+//     }
+
+//     error = send_data_frame(tty_fd, CANUSB_FRAME_STANDARD, binary_id_lsb, binary_id_msb, binary_data, data_len);
+//   }
+
+//   return error;
+// }
 
 
 
@@ -448,10 +449,11 @@ static void dump_data_frames(int tty_fd)
         //for (i = frame_len - 2; i > 3; i--) {
         //  printf("%02x ", frame[i]);
         //} // Right now we would like to see the data frame for debugging
+
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
-        //printf("\n");
-	tcflush(tty_fd, TCIFLUSH);
+        
+	      tcflush(tty_fd, TCIFLUSH);
       } else {
         /*printf("Unknown: ");
         for (i = 0; i <= frame_len; i++) {
@@ -545,7 +547,7 @@ int main(int argc, char *argv[])
   int baudrate = CANUSB_TTY_BAUD_RATE_DEFAULT;
   
 
-
+  // Need to change this so that it only loads with default conditions
   while ((c = getopt(argc, argv, "htd:s:b:i:j:n:g:m:")) != -1) {
     switch (c) {
     case 'h':
@@ -568,23 +570,23 @@ int main(int argc, char *argv[])
       baudrate = atoi(optarg);
       break;
 
-    case 'i':
+    case 'i':           // Not needed
       inject_id = optarg;
       break;
 
-    case 'j':
+    case 'j':           // Not needed
       inject_data = optarg;
       break;
 
-    case 'n':
+    case 'n':           // Not needed
       terminate_after = atoi(optarg);
       break;
 
-    case 'g':
+    case 'g':           // Not needed
       inject_sleep_gap = strtof(optarg, NULL);
       break;
 
-    case 'm':
+    case 'm':           // Not needed
       inject_payload_mode = atoi(optarg);
       break;
 
