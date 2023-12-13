@@ -44,7 +44,7 @@ int iter_num = 0;
 void write_pipe(struct ECU * somedata){
     char buffer[200];
     memset(buffer, 0x00, 200);
-    int written_size = sprintf(buffer,"%d,%f,%d,%d", somedata->rpm, somedata->battery, somedata->man_pres, somedata->throttle);
+    int written_size = sprintf(buffer,"%d,%f,%f,%d", somedata->rpm, somedata->battery, somedata->man_pres, somedata->throttle);
     // Memory copy is more annoying in python. Therefore, we write string data and not raw data here
     
     // fflush(PIPE_PATH); //This is not needed with named pipes
