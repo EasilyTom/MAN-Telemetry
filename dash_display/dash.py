@@ -5,6 +5,8 @@
 
 
 import tkinter as tk
+import ttkbootstrap as tb
+from ttkbootstrap.constants import *
 import os
 import time 
 import random 
@@ -41,16 +43,19 @@ def update_func():
    
    Battery.config(text = ecu_param_list[3])  
 
-   #RPM bar colour and width calculations
-   if tempRPM <= 6000:
-      RPMBar.config(bg = "green")
-   elif (tempRPM > 6000) and (tempRPM <= 7500):
-      RPMBar.config(bg = "yellow")
-   else:
-      RPMBar.config(bg = "red")
+   RPMBar.start()
+   RPMBar.stop()
    
-   RPMBar.config(width = int(tempRPM/85))  
-   window.after(50, update_func)
+   #RPM bar colour and width calculations
+   # if tempRPM <= 6000:
+   #    RPMBar.config(bg = "green")
+   # elif (tempRPM > 6000) and (tempRPM <= 7500):
+   #    RPMBar.config(bg = "yellow")
+   # else:
+   #    RPMBar.config(bg = "red")
+   
+   # RPMBar.config(width = int(tempRPM/85))  
+   # window.after(50, update_func)
 
 
 
@@ -76,8 +81,12 @@ Battery = tk.Label(window  ,padx = 10, text = "0.0", bg = "#404040", fg = "white
 
 RPM = tk.Label(window, padx = 10, text = "1000", bg = '#404040', fg = "white", font = ("Ubuntu", 30))
 
-RPMBar = tk.Label(window, bg= "green", width= 50, height= 4, font= ("Ubuntu", 10)) #Not writing anything, the height value scales with font size
-
+# RPMBar = tk.Label(window, bg= "green", width= 50, height= 4, font= ("Ubuntu", 10)) #Not writing anything, the height value scales with font size
+RPMBar = tb.Floodgauge(window, bootstyle = "success",
+                       maximum = 10000,
+                       orient = "horizontal",
+                       value = 0,
+                       length = 1000)
 Throttle = tk.Label(window, padx = 10, text = "0.0", bg = "#404040", fg = "white", font= ("Ubuntu", 30))
 
 Speed = tk.Label(window, padx = 10, text = "1000", bg = "#404040", fg = "white", font= ("Ubuntu", 30))
@@ -92,6 +101,7 @@ Speed.place(x = 1510, y = 775) # Position for Vehicle speed
 Battery.place(x = 425, y = 315)
 RPM.place(x = 75, y = 315)
 RPMBar.place(x = 20, y = 75)
+# RPMBar.pack(pady = 75, padx = 20, fill = BOTH)
 Throttle.place(x = 1200, y = 775)
 
 # window.attributes("-fullscreen", True) # This one is kinda dangerous fr fr
