@@ -67,7 +67,7 @@ void write_pipe(struct ECU * somedata){
     - ECU Temperature
     - Gear
     */
-    int written_size = sprintf(buffer,"%d,%f,%d,%d,%f,%f,%f,%f,%f,%d", 
+    int written_size = sprintf(buffer,"%d,%.2f,%d,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%d", 
     somedata->rpm, 
     somedata->battery,  
     somedata->throttle,

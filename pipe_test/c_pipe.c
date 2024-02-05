@@ -8,6 +8,7 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -16,29 +17,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../ecu_can_parser.h"
+
 #define PIPE_PATH       "/tmp/can_data_pipe"
 
-/// @brief 
-/// @param 
-struct testData{
-    int rpm;
-    int throttle;
-    int battery;
-    int something_else;
-};
-
-/// @brief Write data to the named pipe.
-/// @param somedata Data structure containing all the data
-void write_pipe(struct testData * somedata){
-    char buffer[200];
-    memset(buffer, 0x00, 200);
-    int written_size = sprintf(buffer,"%d,%d,%d,%d", somedata->rpm, somedata->battery, somedata->something_else, somedata->throttle);
-    // Memory copy is more annoying in python. Therefore, we write string data and not raw data here
-    // fflush(PIPE_PATH); //This is not needed with named pipes
-    int fd = open(PIPE_PATH, O_WRONLY);
-    write(fd , buffer, written_size);
-    close(fd);
-}
 
 int generate_random(int l, int r) { //this will generate random number in range l and r
    int rand_num = (rand() % (r - l + 1)) + l;
@@ -48,10 +30,10 @@ int generate_random(int l, int r) { //this will generate random number in range 
 int main(){
 
     mkfifo(PIPE_PATH, 0666);
-    struct testData myData = {0,0,0,0}; 
+    struct ECU myData = {0,0,0,0,0,0,0,0,0}; 
     
     while(1){
-            if(myData.battery >= 100){
+            if(myData.battery >= 13){
                 myData.battery = 0;
             }
             else{
@@ -64,10 +46,10 @@ int main(){
                 myData.throttle ++;
             }
             if(myData.rpm >= 10000){
-                myData.rpm = 1000;
+                myData.rpm -= 6000;
             }
             else{
-                myData.rpm += 100;
+                myData.rpm += 1000;
             }
             write_pipe(&myData); 
             usleep(50000);
