@@ -26,6 +26,7 @@ def read_forza():
                 __ecu_param_list[1] = int(round(value, 0))
         
         __full_forza_data.append(__ecu_param_list)
+        # print(__ecu_param_list)
 
     return __full_forza_data
 
@@ -84,7 +85,46 @@ class MetricBox():
         self.title_element.config(font=("Bai Jamjuree", 10))
         self.title_element.place(x=9, y=12)
         
+class ShiftLights():
+    def __init__(self, window, x, y):
+        self.frame = tk.Frame(window, bd=0, highlightthickness=0, bg='black')
+        
+        self.canvas = tk.Canvas(self.frame, bg='black', bd=0, highlightthickness=0, width=722, height=39)
+        self.canvas.pack()
+        
+        self.light_colors = [
+            '#EC0000', '#EC0000', '#EC0000', '#EC0000', '#EC0000',
+            '#99FF75', '#99FF75',
+            '#2871FF',
+            '#8C6FFF', '#8C6FFF'
+        ]
+        
+        self.lights = []
+        x_offset = 51
+        for i in range(10):
+            self.lights.append(self.canvas.create_oval(x_offset, 7, (x_offset + 26), (7+26), fill='#4C4C4C', outline='#4C4C4C'))
+            x_offset += (26+40)
+        
+        self.frame.place(x=x, y=y, width=722, height=39)
+        
+    def update_lights(self, rpm):
+        # Reset all lights to off
+        for light in self.lights:
+            self.canvas.itemconfig(light, fill='#4C4C4C', outline='#4C4C4C')
 
+        # Determine how many lights to turn on
+        if rpm > 8000:
+            lights_to_illuminate = 10
+        elif rpm > 7000:
+            lights_to_illuminate = 8
+        else:
+            # Linearly scale the number of lights based on the rpm value
+            lights_to_illuminate = int(rpm / 8000 * 10)
+
+        # Turn on the appropriate number of lights
+        for i in range(lights_to_illuminate):
+            self.canvas.itemconfig(self.lights[i], fill=self.light_colors[i], outline=self.light_colors[i])
+        
 window = tk.Tk(className="Dash V2")
 window.geometry("800x480")
 window.configure(bg='black')
@@ -114,6 +154,8 @@ boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
 boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
 boxes.append(MetricBox(window, 508, 237, field=Fields.COOLANT_TEMP))
 
+shift_lights = ShiftLights(window, 39, 9)
+
 def update_func():
     global full_forza_data
     global index
@@ -135,6 +177,8 @@ def update_func():
             box.value_element.config(text=f'{ecu_param_list[3]} {box.field.value[1]}')
         else:
             continue
+        
+    shift_lights.update_lights(rpm)
     
     window.after(1, update_func)
 
