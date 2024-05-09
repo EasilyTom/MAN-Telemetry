@@ -10,7 +10,7 @@ def read_forza():
     __full_forza_data = []
 
     for _,data in fsdp.dataframe.iterrows():
-        __ecu_param_list = ["0", "0", "0", "0", "N", "0"] # Initing a global array 
+        __ecu_param_list = [None, None, None, None, None, None, None, None, None, None, None] # Initing a global array 
         for _, keyblock in fsdp.key_list.iterrows():
             value = data[keyblock['corrected_position']]
             if pd.isna(keyblock['conversion']) == False:
@@ -32,25 +32,27 @@ def read_forza():
 
 # canPipe = "/tmp/can_data_pipe"
 # print("Display test. Reading: " + canPipe)
-# 0: RPM, 1: Throttle, 2: ?, 3: Battery, 4: Gear, 5: Speed
-ecu_param_list = ["0", "0", "0", "0", "N", "0"] # Initing a global array
+# 0: RPM, 1: Throttle, 2: ?, 3: Battery, 4: Gear, 5: Speed, 6: ECU Temp, 7: Coolant Temp, 8: Fuel Pressure, 9: Oil Pressure, 10: Oil Temp
+ecu_param_list = [None, None, None, None, None, None, None, None, None, None, None] # Initing a global array
 
 index = 0
 full_forza_data = read_forza()
 
+# Field = (Title, Unit String, [Low, High])
 class Fields(Enum):
-    THROTTLE_POS = ("THROTTLE POSITION", "%")
-    FUEL_PRES = ("FUEL PRESSURE", "kPa")
-    OIL_PRES = ("OIL PRESSURE", "kPa")
-    BATTERY_VOLT = ("BATTERY VOLTAGE", "V")
-    ECU_TEMP = ("ECU TEMPERATURE", "C")
-    COOLANT_TEMP = ("COOLANT TEMPERATURE", "C")
+    THROTTLE_POS = ("THROTTLE POSITION", "%", [20, 90])
+    FUEL_PRES = ("FUEL PRESSURE", "kPa", [0, 100])
+    OIL_PRES = ("OIL PRESSURE", "kPa", [0, 100])
+    BATTERY_VOLT = ("BATTERY VOLTAGE", "V", [0, 100])
+    ECU_TEMP = ("ECU TEMPERATURE", "C", [0, 100])
+    COOLANT_TEMP = ("COOLANT TEMPERATURE", "C", [0, 100])
     
 class StatusConfigs(Enum):
     # Status Text, Box Image Path, Param Title Text Colour, Status Text Colour, Value Colour
-    NORMAL = ("OK", "", "#B2B2B2", "#99FF75", "#FFFFFF")
-    LOW = ("LOW", "", "#9DBEFF", "#8DABE5", "#2871FF")
-    HIGH = ("HIGH", "", "#FF5050", "#E5B9B9", "#FF5050")
+    NORMAL = ("OK", "box_images/box.png", "#B2B2B2", "#99FF75", "#FFFFFF")
+    LOW = ("LOW", "box_images/low_box.png", "#9DBEFF", "#8DABE5", "#2871FF")
+    HIGH = ("HIGH", "box_images/warning_box.png", "#FF5050", "#E5B9B9", "#FF5050")
+    FUCKED = ("FUCKED", "box_images/warning_box.png", "#FF5050", "#E5B9B9", "#FF5050")
 
 class MetricBox():
     def __init__(self, window, x, y, field: Fields):
@@ -62,7 +64,7 @@ class MetricBox():
         self.frame.place(x=x, y=y)
         
         # Create the box image
-        box_image = Image.open('box_images/box.png')
+        box_image = Image.open(self.param_status.value[1])
         box_image = box_image.resize((254, 70))
         box_image = box_image.convert("RGB")
         box_image = ImageTk.PhotoImage(box_image)
@@ -85,6 +87,35 @@ class MetricBox():
         self.title_element.config(font=("Bai Jamjuree", 10))
         self.title_element.place(x=9, y=12)
         
+    def update_box_image(self):
+        box_image = Image.open(self.param_status.value[1])
+        box_image = box_image.resize((254, 70))
+        box_image = box_image.convert("RGB")
+        box_image = ImageTk.PhotoImage(box_image)
+        self.background = tk.Label(self.frame, image=box_image, bd=0, highlightthickness=0)
+        
+    def update_colouring(self):
+        self.value_element.config(fg=self.param_status.value[4])
+        self.status_element.config(text=self.param_status.value[0], fg=self.param_status.value[3])
+        self.title_element.config(fg=self.param_status.value[2])
+        
+    def update_box(self, value):
+        if value == None:
+            self.param_status = StatusConfigs.FUCKED
+            self.value_element.config(text=f'XX {self.field.value[1]}')
+        elif value < self.field.value[2][0]:
+            self.param_status = StatusConfigs.LOW
+            self.value_element.config(text=f'{value} {self.field.value[1]}')
+        elif value > self.field.value[2][1]:
+            self.param_status = StatusConfigs.HIGH
+            self.value_element.config(text=f'{value} {self.field.value[1]}')
+        else:
+            self.param_status = StatusConfigs.NORMAL
+            self.value_element.config(text=f'{value} {self.field.value[1]}')
+        
+        self.update_box_image()
+        self.update_colouring()
+        
 class ShiftLights():
     def __init__(self, window, x, y):
         self.frame = tk.Frame(window, bd=0, highlightthickness=0, bg='black')
@@ -104,6 +135,13 @@ class ShiftLights():
         for i in range(10):
             self.lights.append(self.canvas.create_oval(x_offset, 7, (x_offset + 26), (7+26), fill='#4C4C4C', outline='#4C4C4C'))
             x_offset += (26+40)
+            
+        self.boost_bar_image = Image.open('box_images/boost_bar.png')
+        self.boost_bar_image = self.boost_bar_image.resize((30, 480))
+        self.boost_bar_image = ImageTk.PhotoImage(self.boost_bar_image)
+
+        self.left_bar = tk.Label(window, image=self.boost_bar_image, width=30, height=480)
+        self.right_bar = tk.Label(window, image=self.boost_bar_image, width=30, height=480)
         
         self.frame.place(x=x, y=y, width=722, height=39)
         
@@ -111,10 +149,15 @@ class ShiftLights():
         # Reset all lights to off
         for light in self.lights:
             self.canvas.itemconfig(light, fill='#4C4C4C', outline='#4C4C4C')
+        
+        self.left_bar.place_forget()
+        self.right_bar.place_forget()
 
         # Determine how many lights to turn on
         if rpm > 8000:
             lights_to_illuminate = 10
+            self.left_bar.place(x=0, y=0)
+            self.right_bar.place(x=770, y=0)
         elif rpm > 7000:
             lights_to_illuminate = 8
         else:
@@ -154,6 +197,9 @@ boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
 boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
 boxes.append(MetricBox(window, 508, 237, field=Fields.COOLANT_TEMP))
 
+for box in boxes:
+    box.update_box(None)
+
 shift_lights = ShiftLights(window, 39, 9)
 
 def update_func():
@@ -172,9 +218,17 @@ def update_func():
     
     for box in boxes:
         if (box.field == Fields.THROTTLE_POS):
-            box.value_element.config(text=f'{ecu_param_list[1]} {box.field.value[1]}')
+            box.update_box(value=ecu_param_list[1])
         elif (box.field == Fields.BATTERY_VOLT):
-            box.value_element.config(text=f'{ecu_param_list[3]} {box.field.value[1]}')
+            box.update_box(value=ecu_param_list[3])
+        elif (box.field == Fields.ECU_TEMP):
+            box.update_box(value=ecu_param_list[6])
+        elif (box.field == Fields.COOLANT_TEMP):
+            box.update_box(value=ecu_param_list[7])
+        elif (box.field == Fields.FUEL_PRES):
+            box.update_box(value=ecu_param_list[8])
+        elif (box.field == Fields.OIL_PRES):
+            box.update_box(value=ecu_param_list[9])
         else:
             continue
         
