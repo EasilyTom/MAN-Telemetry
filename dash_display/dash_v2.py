@@ -182,5 +182,6 @@ def update_func():
     
     window.after(1, update_func)
 
+window.attributes("-fullscreen", True)
 window.after(1, update_func)
 window.mainloop()
