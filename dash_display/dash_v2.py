@@ -1,6 +1,41 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from enum import Enum
+import pandas as pd
+
+def read_forza():
+    import forza_sim_data.data_parser as fsdp
+    import pandas as pd
+    
+    __full_forza_data = []
+
+    for _,data in fsdp.dataframe.iterrows():
+        __ecu_param_list = ["0", "0", "0", "0", "N", "0"] # Initing a global array 
+        for _, keyblock in fsdp.key_list.iterrows():
+            value = data[keyblock['corrected_position']]
+            if pd.isna(keyblock['conversion']) == False:
+                value = value * keyblock['conversion']
+                
+            if keyblock['name'] == 'Gear':
+                __ecu_param_list[4] = int(value)
+            elif keyblock['name'] == 'Speed':
+                __ecu_param_list[5] = int(round(value, 0))
+            elif keyblock['name'] == 'CurrentEngineRpm':
+                __ecu_param_list[0] = value
+            elif keyblock['name'] == 'Accel':
+                __ecu_param_list[1] = int(round(value, 0))
+        
+        __full_forza_data.append(__ecu_param_list)
+
+    return __full_forza_data
+
+# canPipe = "/tmp/can_data_pipe"
+# print("Display test. Reading: " + canPipe)
+# 0: RPM, 1: Throttle, 2: ?, 3: Battery, 4: Gear, 5: Speed
+ecu_param_list = ["0", "0", "0", "0", "N", "0"] # Initing a global array
+
+index = 0
+full_forza_data = read_forza()
 
 class Fields(Enum):
     THROTTLE_POS = ("THROTTLE POSITION", "%")
@@ -69,15 +104,39 @@ speed_indicator = tk.Label(window, text='XXX', bg='black', fg='white')
 speed_indicator.config(font=("Bai Jamjuree", 50))
 speed_indicator.place(x=354, y=344, width=90, height=63)
 
-def draw_initial_boxes():
-    boxes = []
-    boxes.append(MetricBox(window, 38, 67, field=Fields.FUEL_PRES))
-    boxes.append(MetricBox(window, 38, 152, field=Fields.OIL_PRES))
-    boxes.append(MetricBox(window, 38, 237, field=Fields.THROTTLE_POS))
+boxes = []
+
+boxes.append(MetricBox(window, 38, 67, field=Fields.FUEL_PRES))
+boxes.append(MetricBox(window, 38, 152, field=Fields.OIL_PRES))
+boxes.append(MetricBox(window, 38, 237, field=Fields.THROTTLE_POS))
+
+boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
+boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
+boxes.append(MetricBox(window, 508, 237, field=Fields.COOLANT_TEMP))
+
+def update_func():
+    global full_forza_data
+    global index
     
-    boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
-    boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
-    boxes.append(MetricBox(window, 508, 237, field=Fields.COOLANT_TEMP))
+    ecu_param_list = full_forza_data[index]
+    index+=1
     
-draw_initial_boxes()
+    rpm = int(ecu_param_list[0])
+    speed = int(ecu_param_list[5])
+    gear = ecu_param_list[4]
+    
+    gear_indicator.config(text=gear)
+    speed_indicator.config(text=speed)
+    
+    for box in boxes:
+        if (box.field == Fields.THROTTLE_POS):
+            box.value_element.config(text=f'{ecu_param_list[1]} {box.field.value[1]}')
+        elif (box.field == Fields.BATTERY_VOLT):
+            box.value_element.config(text=f'{ecu_param_list[3]} {box.field.value[1]}')
+        else:
+            continue
+    
+    window.after(1, update_func)
+
+window.after(1, update_func)
 window.mainloop()
