@@ -76,11 +76,11 @@ class MetricBox():
         self.background.image = box_image
         
         self.value_element = tk.Label(self.frame, text=f'?? {self.field.value[1]}', bg='black', fg=self.param_status.value[4], anchor='e')
-        self.value_element.config(font=("Bai Jamjuree", 30))
+        self.value_element.config(font=("BaiJamjuree-SemiBold", 30))
         self.value_element.place(x=125, y=16, width=120, height=38)
         
         self.status_element = tk.Label(self.frame, text=self.param_status.value[0], bg='black', fg=self.param_status.value[3])
-        self.status_element.config(font=("Bai Jamjuree", 20))
+        self.status_element.config(font=("BaiJamjuree", 20))
         self.status_element.place(x=9, y=27)
         
         self.title_element = tk.Label(self.frame, text=field.value[0], bg='black', fg=self.param_status.value[2])
@@ -120,7 +120,7 @@ class ShiftLights():
     def __init__(self, window, x, y):
         self.frame = tk.Frame(window, bd=0, highlightthickness=0, bg='black')
         
-        self.canvas = tk.Canvas(self.frame, bg='black', bd=0, highlightthickness=0, width=722, height=39)
+        self.canvas = tk.Canvas(self.frame, bg='black', bd=0, highlightthickness=1, highlightbackground='#4C4C4C', width=722, height=39)
         self.canvas.pack()
         
         self.light_colors = [
@@ -133,7 +133,7 @@ class ShiftLights():
         self.lights = []
         x_offset = 51
         for i in range(10):
-            self.lights.append(self.canvas.create_oval(x_offset, 7, (x_offset + 26), (7+26), fill='#4C4C4C', outline='#4C4C4C'))
+            self.lights.append(self.canvas.create_oval(x_offset, 6, (x_offset + 26), (6+26), fill='#4C4C4C', outline='#4C4C4C'))
             x_offset += (26+40)
             
         self.boost_bar_image = Image.open('box_images/boost_bar.png')
@@ -179,12 +179,27 @@ skeleton = ImageTk.PhotoImage(skeleton)
 label1 = tk.Label(window, image = skeleton)
 label1.place(x=0, y=0)
 
+# frameCnt = 76
+# frames = [tk.PhotoImage(file='box_images/plaid.gif',format = 'gif -index %i' %(i)) for i in range(frameCnt)]
+# ind = 0
+
+# def update_gif(ind):
+#     frame = frames[ind]
+#     ind += 1
+#     if ind == frameCnt:
+#         ind = 0
+#     gif_player.configure(image=frame)
+#     window.after(20, update_gif, ind)
+
+# gif_player = tk.Label(window, bg='black', width=800, height=450)
+# gif_player.place(x=0, y=0)
+
 gear_indicator = tk.Label(window, text='N', bg='black', fg='white')
-gear_indicator.config(font=("Bai Jamjuree", 200))
+gear_indicator.config(font=("BaiJamjuree-Bold", 200))
 gear_indicator.place(x=337, y=87, width=125, height=200)
 
 speed_indicator = tk.Label(window, text='XXX', bg='black', fg='white')
-speed_indicator.config(font=("Bai Jamjuree", 50))
+speed_indicator.config(font=("BaiJamjuree-Bold", 50))
 speed_indicator.place(x=354, y=344, width=90, height=63)
 
 boxes = []
@@ -205,6 +220,7 @@ shift_lights = ShiftLights(window, 39, 9)
 def update_func():
     global full_forza_data
     global index
+    global gif_player
     
     ecu_param_list = full_forza_data[index]
     index+=1
@@ -238,4 +254,5 @@ def update_func():
 
 window.attributes("-fullscreen", True)
 window.after(1, update_func)
+# window.after(1, update_gif, ind)
 window.mainloop()
