@@ -3,6 +3,7 @@ import tkinter.font as tkFont
 from PIL import Image, ImageTk
 from enum import Enum
 import pandas as pd
+import os
 
 def read_forza():
     import forza_sim_data.data_parser as fsdp
@@ -31,10 +32,30 @@ def read_forza():
 
     return __full_forza_data
 
-# canPipe = "/tmp/can_data_pipe"
-# print("Display test. Reading: " + canPipe)
+canPipe = "/tmp/can_data_pipe"
+print("Display test. Reading: " + canPipe)
+# os.system("./canusb -d dev/ttyUSB0 -s 1000000") # This can also run the cansub. Bash script not necessary
+
 # 0: RPM, 1: Throttle, 2: ?, 3: Battery, 4: Gear, 5: Speed, 6: ECU Temp, 7: Coolant Temp, 8: Fuel Pressure, 9: Oil Pressure, 10: Oil Temp
-ecu_param_list = [None, None, None, None, None, None, None, None, None, None, None] # Initing a global array
+# ecu_param_list = [None, None, None, None, None, None, None, None, None, None, None] # Initing a global array
+ecu_param_list = ["0"] * 11
+
+def try_reading(): 
+   try:
+      with open(canPipe, "r") as pipe:
+         global ecu_param_list
+         data_buffer = pipe.read() #Okay this is reading properly. Fucking sexy
+         ecu_param_list = data_buffer.split(',')
+         
+         if len(ecu_param_list) < 11:
+             ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
+         
+         # for x in ecu_param_list:
+         #    print(x)
+   except FileNotFoundError:
+      print("Named pipe does not exist!")
+   except OSError as e:
+      print(f"Failed to read data from named pipe: {e}")
 
 index = 0
 full_forza_data = read_forza()
@@ -232,13 +253,16 @@ for box in boxes:
 
 shift_lights = ShiftLights(window, 39, 9)
 
-def update_func():
+def update_func(play_forza=True):
     global full_forza_data
     global index
     global gif_player
     
-    ecu_param_list = full_forza_data[index]
-    index+=1
+    if play_forza is True:
+        ecu_param_list = full_forza_data[index]
+        index+=1
+    else:
+        try_reading()
     
     rpm = int(ecu_param_list[0])
     speed = int(ecu_param_list[5])
