@@ -78,7 +78,7 @@ class MetricBox():
         self.background.image = box_image
         
         self.value_element = tk.Label(self.frame, text=f'?? {self.field.value[1]}', bg='black', fg=self.param_status.value[4], anchor='e')
-        self.value_element.config(font=("BaiJamjuree-SemiBold", 30))
+        self.value_element.config(font=BJ30_SEMI)
         self.value_element.place(x=125, y=16, width=120, height=38)
         
         self.status_element = tk.Label(self.frame, text=self.param_status.value[0], bg='black', fg=self.param_status.value[3])
@@ -86,7 +86,7 @@ class MetricBox():
         self.status_element.place(x=9, y=27)
         
         self.title_element = tk.Label(self.frame, text=field.value[0], bg='black', fg=self.param_status.value[2])
-        self.title_element.config(font=("Bai Jamjuree", 10))
+        self.title_element.config(font=BJ10_REG)
         self.title_element.place(x=9, y=12)
         
     def update_box_image(self):
@@ -180,7 +180,9 @@ window.configure(bg='black')
 
 window.bind('<q>', close_app)
 
+BJ10_REG = tkFont.Font(family='Bai Jamjuree', size=10)
 BJ20_REG = tkFont.Font(family='Bai Jamjuree', size=20)
+BJ30_SEMI = tkFont.Font(family='BaiJamjuree-SemiBold', size=30, weight='normal')
 BJ200_BOLD = tkFont.Font(family='Bai Jamjuree', size=200, weight='bold')
 BJ50_BOLD = tkFont.Font(family='Bai Jamjuree', size=50, weight='bold')
 
