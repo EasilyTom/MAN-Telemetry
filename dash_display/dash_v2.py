@@ -53,7 +53,7 @@ class StatusConfigs(Enum):
     NORMAL = ("OK", "box_images/box.png", "#B2B2B2", "#99FF75", "#FFFFFF")
     LOW = ("LOW", "box_images/low_box.png", "#9DBEFF", "#8DABE5", "#2871FF")
     HIGH = ("HIGH", "box_images/warning_box.png", "#FF5050", "#E5B9B9", "#FF5050")
-    FUCKED = ("FUCKED", "box_images/warning_box.png", "#FF5050", "#E5B9B9", "#FF5050")
+    FUCKED = ("UNAVAIL", "box_images/warning_box.png", "#FF5050", "#E5B9B9", "#FF5050")
 
 class MetricBox():
     def __init__(self, window, x, y, field: Fields):
@@ -168,10 +168,16 @@ class ShiftLights():
         # Turn on the appropriate number of lights
         for i in range(lights_to_illuminate):
             self.canvas.itemconfig(self.lights[i], fill=self.light_colors[i], outline=self.light_colors[i])
+            
+def close_app(event):
+    if event.char.lower() == 'q':
+        window.destroy()
         
 window = tk.Tk(className="Dash V2")
 window.geometry("800x480")
 window.configure(bg='black')
+
+window.bind('<q>', close_app)
 
 skeleton = Image.open('skeleton.png')
 skeleton = skeleton.resize((800, 480))
