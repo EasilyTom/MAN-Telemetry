@@ -624,22 +624,25 @@ int main(int argc, char *argv[])
 
   command_settings(tty_fd, speed, CANUSB_MODE_NORMAL, CANUSB_FRAME_STANDARD);
 
-  if (inject_data == NULL) {
-    /* Dumping mode (default). */
-    dump_data_frames(tty_fd);
-  } else {
-    /* Inject mode. */
-    if (inject_id == NULL) {
-      fprintf(stderr, "Please specify a ID for injection!\n");
-      display_help(argv[0]);
-      return EXIT_FAILURE;
-    }
-    if (inject_data_frame(tty_fd, inject_id, inject_data) == -1) {
-      return EXIT_FAILURE;
-    } else {
-      return EXIT_SUCCESS;
-    }
-  }
+  dump_data_frames(tty_fd);
+
+  // if (inject_data == NULL) {
+  //   /* Dumping mode (default). */
+  //   dump_data_frames(tty_fd);
+  // } 
+  // else {
+  //   /* Inject mode. */
+  //   if (inject_id == NULL) {
+  //     fprintf(stderr, "Please specify a ID for injection!\n");
+  //     display_help(argv[0]);
+  //     return EXIT_FAILURE;
+  //   }
+  //   if (inject_data_frame(tty_fd, inject_id, inject_data) == -1) {
+  //     return EXIT_FAILURE;
+  //   } else {
+  //     return EXIT_SUCCESS;
+  //   }
+  // }
 
   return EXIT_SUCCESS;
 }
