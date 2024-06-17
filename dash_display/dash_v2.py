@@ -46,6 +46,7 @@ class Fields(Enum):
     BATTERY_VOLT = ("BATTERY VOLTAGE", "V", [0, 100])
     ECU_TEMP = ("ECU TEMPERATURE", "C", [0, 100])
     COOLANT_TEMP = ("COOLANT TEMPERATURE", "C", [0, 100])
+    OIL_TEMP = ("OIL TEMPERATURE", "C", [0, 100])
     
 class StatusConfigs(Enum):
     # Status Text, Box Image Path, Param Title Text Colour, Status Text Colour, Value Colour
@@ -211,6 +212,7 @@ boxes.append(MetricBox(window, 38, 237, field=Fields.THROTTLE_POS))
 boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
 boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
 boxes.append(MetricBox(window, 508, 237, field=Fields.COOLANT_TEMP))
+boxes.append(MetricBox(window, 508, 322, field=Fields.OIL_TEMP))
 
 for box in boxes:
     box.update_box(None)
