@@ -201,7 +201,7 @@ window.configure(bg='black')
 
 window.bind('<q>', close_app)
 
-font_scale = 1.0
+font_scale = 1.0 # 0.7 for the PI
 BJ10_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(10*font_scale, 0)))
 BJ20_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(20*font_scale, 0)))
 BJ30_SEMI = tkFont.Font(family='Bai Jamjuree', size=int(round(30*font_scale, 0)), weight='bold')
