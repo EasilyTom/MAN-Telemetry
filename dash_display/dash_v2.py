@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as tkFont
 from PIL import Image, ImageTk
 from enum import Enum
 import pandas as pd
@@ -81,7 +82,7 @@ class MetricBox():
         self.value_element.place(x=125, y=16, width=120, height=38)
         
         self.status_element = tk.Label(self.frame, text=self.param_status.value[0], bg='black', fg=self.param_status.value[3])
-        self.status_element.config(font=("BaiJamjuree", 20))
+        self.status_element.config(font=BJ20_REG)
         self.status_element.place(x=9, y=27)
         
         self.title_element = tk.Label(self.frame, text=field.value[0], bg='black', fg=self.param_status.value[2])
@@ -179,6 +180,10 @@ window.configure(bg='black')
 
 window.bind('<q>', close_app)
 
+BJ20_REG = tkFont.Font(family='Bai Jamjuree', size=20)
+BJ200_BOLD = tkFont.Font(family='Bai Jamjuree', size=200, weight='bold')
+BJ50_BOLD = tkFont.Font(family='Bai Jamjuree', size=50, weight='bold')
+
 skeleton = Image.open('skeleton.png')
 skeleton = skeleton.resize((800, 480))
 skeleton = ImageTk.PhotoImage(skeleton)
@@ -202,11 +207,11 @@ label1.place(x=0, y=0)
 # gif_player.place(x=0, y=0)
 
 gear_indicator = tk.Label(window, text='N', bg='black', fg='white')
-gear_indicator.config(font=("BaiJamjuree-Bold", 200))
+gear_indicator.config(font=BJ200_BOLD)
 gear_indicator.place(x=337, y=87, width=125, height=200)
 
 speed_indicator = tk.Label(window, text='XXX', bg='black', fg='white')
-speed_indicator.config(font=("BaiJamjuree-Bold", 50))
+speed_indicator.config(font=BJ50_BOLD)
 speed_indicator.place(x=354, y=344, width=90, height=63)
 
 boxes = []
