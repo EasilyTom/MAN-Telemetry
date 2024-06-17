@@ -204,7 +204,7 @@ window.bind('<q>', close_app)
 font_scale = 1.0
 BJ10_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(10*font_scale, 0)))
 BJ20_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(20*font_scale, 0)))
-BJ30_SEMI = tkFont.Font(family='BaiJamjuree-SemiBold', size=int(round(30*font_scale, 0)), weight='normal')
+BJ30_SEMI = tkFont.Font(family='Bai Jamjuree', size=int(round(30*font_scale, 0)), weight='bold')
 BJ200_BOLD = tkFont.Font(family='Bai Jamjuree', size=int(round(200*font_scale, 0)), weight='bold')
 BJ50_BOLD = tkFont.Font(family='Bai Jamjuree', size=int(round(50*font_scale, 0)), weight='bold')
 
