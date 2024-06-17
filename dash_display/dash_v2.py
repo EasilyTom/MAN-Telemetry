@@ -201,7 +201,7 @@ window.configure(bg='black')
 
 window.bind('<q>', close_app)
 
-font_scale = 1.0 # 0.7 for the PI
+font_scale = 0.7 # 0.7 for the PI
 BJ10_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(10*font_scale, 0)))
 BJ20_REG = tkFont.Font(family='Bai Jamjuree', size=int(round(20*font_scale, 0)))
 BJ30_SEMI = tkFont.Font(family='Bai Jamjuree', size=int(round(30*font_scale, 0)), weight='bold')
@@ -215,20 +215,20 @@ skeleton = ImageTk.PhotoImage(skeleton)
 label1 = tk.Label(window, image = skeleton)
 label1.place(x=0, y=0)
 
-frameCnt = 76
-frames = [tk.PhotoImage(file='box_images/plaid.gif',format = 'gif -index %i' %(i)) for i in range(frameCnt)]
-ind = 0
+# frameCnt = 76
+# frames = [tk.PhotoImage(file='box_images/plaid.gif',format = 'gif -index %i' %(i)) for i in range(frameCnt)]
+# ind = 0
 
-def update_gif(ind):
-    frame = frames[ind]
-    ind += 1
-    if ind == frameCnt:
-        ind = 0
-    gif_player.configure(image=frame)
-    window.after(20, update_gif, ind)
+# def update_gif(ind):
+#     frame = frames[ind]
+#     ind += 1
+#     if ind == frameCnt:
+#         ind = 0
+#     gif_player.configure(image=frame)
+#     window.after(20, update_gif, ind)
 
-gif_player = tk.Label(window, bg='black', width=800, height=450)
-playing_gif = False
+# gif_player = tk.Label(window, bg='black', width=800, height=450)
+# playing_gif = False
 
 gear_indicator = tk.Label(window, text='N', bg='black', fg='white')
 gear_indicator.config(font=BJ200_BOLD)
@@ -257,8 +257,8 @@ shift_lights = ShiftLights(window, 39, 9)
 def update_func(play_forza=True):
     global full_forza_data
     global index
-    global gif_player
-    global playing_gif
+    # global gif_player
+    # global playing_gif
     
     if play_forza is True:
         ecu_param_list = full_forza_data[index]
@@ -269,15 +269,15 @@ def update_func(play_forza=True):
     rpm = int(ecu_param_list[0])
     speed = int(ecu_param_list[5])
     
-    if speed >= 80 and speed <= 110:
-        if playing_gif is False:
-            playing_gif = True
-            gif_player.place(x=0, y=0)
+    # if speed >= 70 and speed <= 150:
+    #     if playing_gif is False:
+    #         playing_gif = True
+    #         gif_player.place(x=0, y=0)
             
         # window.after(1, update_gif, ind)
-    else:
-        playing_gif = False
-        gif_player.place_forget()
+    # else:
+    #     playing_gif = False
+    #     gif_player.place_forget()
     
     gear = ecu_param_list[4]
     
@@ -306,5 +306,5 @@ def update_func(play_forza=True):
 
 window.attributes("-fullscreen", True)
 window.after(1, update_func)
-window.after(1, update_gif, ind)
+# window.after(1, update_gif, ind)
 window.mainloop()
