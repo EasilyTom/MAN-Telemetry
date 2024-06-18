@@ -51,6 +51,7 @@ def try_reading():
         #      ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
          print(ecu_param_list)
          ECU_DATA.update_ecu_temp(ecu_param_list[7])
+         print(ECU_DATA.ecu_temp)
          
          # for x in ecu_param_list:
          #    print(x)
