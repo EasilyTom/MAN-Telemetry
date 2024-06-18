@@ -80,7 +80,7 @@ class ECU_DataClass:
         self.coolant_temp = float(raw) - 273.0
         
     def update_rpm(self, raw):
-        self.rpm = float(raw)
+        self.rpm = int(raw)
         
     def update_oil_temp(self, raw):
         self.oil_temp = float(raw) - 273.0
@@ -297,7 +297,7 @@ def update_func(play_forza=False):
         ecu_param_list = [0] * 11
         try_reading()
     
-    rpm = int(ecu_param_list[0])
+    # rpm = int(ecu_param_list[0])
     speed = int(ecu_param_list[5])
     
     # if speed >= 70 and speed <= 150:
