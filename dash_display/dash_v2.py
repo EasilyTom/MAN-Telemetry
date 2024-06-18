@@ -63,7 +63,7 @@ def try_reading():
       print(f"Failed to read data from named pipe: {e}")
 
 index = 0
-full_forza_data = read_forza()
+# full_forza_data = read_forza()
 
 class ECU_DataClass:
     def __init__(self):
@@ -75,8 +75,7 @@ class ECU_DataClass:
         self.ecu_temp = float(raw) / 10.0
     
     def update_coolant_temp(self, raw):
-        kelvin_value = float(raw) / 10.0
-        self.coolant_temp = kelvin_value - 273
+        self.coolant_temp = float(raw) - 273.0
         
     def update_rpm(self, raw):
         self.rpm = float(raw)
@@ -329,7 +328,7 @@ def update_func(play_forza=False):
         else:
             continue
         
-    shift_lights.update_lights(rpm)
+    shift_lights.update_lights(int(ECU_DATA.rpm))
     
     window.after(1, update_func)
 
