@@ -53,6 +53,7 @@ def try_reading():
          ECU_DATA.update_rpm(ecu_param_list[0])
          ECU_DATA.update_coolant_temp(ecu_param_list[6])
          ECU_DATA.update_ecu_temp(ecu_param_list[8])
+         ECU_DATA.update_oil_temp(ecu_param_list[5])
         #  print(ECU_DATA.ecu_temp)
          
          # for x in ecu_param_list:
@@ -70,6 +71,7 @@ class ECU_DataClass:
         self.ecu_temp = 0.0
         self.coolant_temp = 0.0
         self.rpm = 0.0
+        self.oil_temp = 0.0
         
     def update_ecu_temp(self, raw):
         self.ecu_temp = float(raw) / 10.0
@@ -79,6 +81,9 @@ class ECU_DataClass:
         
     def update_rpm(self, raw):
         self.rpm = float(raw)
+        
+    def update_oil_temp(self, raw):
+        self.oil_temp = float(raw) - 273.0
         
 
 # Field = (Title, Unit String, [Low, High])
@@ -325,6 +330,8 @@ def update_func(play_forza=False):
             box.update_box(value=ecu_param_list[9])
         elif (box.field == Fields.RPM):
             box.update_box(value=ECU_DATA.rpm)
+        elif (box.field == Fields.OIL_TEMP):
+            box.update_box(value=ECU_DATA.oil_temp)
         else:
             continue
         
