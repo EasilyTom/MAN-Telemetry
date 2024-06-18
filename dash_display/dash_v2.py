@@ -50,6 +50,8 @@ def try_reading():
         #  if len(ecu_param_list) < 11:
         #      ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
         #  print(ecu_param_list)
+         ECU_DATA.update_rpm(ecu_param_list[0])
+         ECU_DATA.update_coolant_temp(ecu_param_list[6])
          ECU_DATA.update_ecu_temp(ecu_param_list[8])
         #  print(ECU_DATA.ecu_temp)
          
@@ -66,9 +68,19 @@ full_forza_data = read_forza()
 class ECU_DataClass:
     def __init__(self):
         self.ecu_temp = 0.0
+        self.coolant_temp = 0.0
+        self.rpm = 0.0
         
     def update_ecu_temp(self, raw):
         self.ecu_temp = float(raw) / 10.0
+    
+    def update_coolant_temp(self, raw):
+        kelvin_value = float(raw) / 10.0
+        self.coolant_temp = kelvin_value - 273
+        
+    def update_rpm(self, raw):
+        self.rpm = float(raw)
+        
 
 # Field = (Title, Unit String, [Low, High])
 class Fields(Enum):
@@ -79,6 +91,7 @@ class Fields(Enum):
     ECU_TEMP = ("ECU TEMPERATURE", "C", [0, 100])
     COOLANT_TEMP = ("COOLANT TEMPERATURE", "C", [0, 100])
     OIL_TEMP = ("OIL TEMPERATURE", "C", [0, 100])
+    RPM = ("RPM", "RPM", [0, 10000])
     
 class StatusConfigs(Enum):
     # Status Text, Box Image Path, Param Title Text Colour, Status Text Colour, Value Colour
@@ -255,6 +268,7 @@ boxes = []
 boxes.append(MetricBox(window, 38, 67, field=Fields.FUEL_PRES))
 boxes.append(MetricBox(window, 38, 152, field=Fields.OIL_PRES))
 boxes.append(MetricBox(window, 38, 237, field=Fields.THROTTLE_POS))
+boxes.append(MetricBox(window, 38, 322, field=Fields.RPM))
 
 boxes.append(MetricBox(window, 508, 67, field=Fields.BATTERY_VOLT))
 boxes.append(MetricBox(window, 508, 152, field=Fields.ECU_TEMP))
@@ -305,11 +319,13 @@ def update_func(play_forza=False):
         elif (box.field == Fields.ECU_TEMP):
             box.update_box(value=ECU_DATA.ecu_temp)
         elif (box.field == Fields.COOLANT_TEMP):
-            box.update_box(value=ecu_param_list[7])
+            box.update_box(value=ECU_DATA.coolant_temp)
         elif (box.field == Fields.FUEL_PRES):
             box.update_box(value=ecu_param_list[8])
         elif (box.field == Fields.OIL_PRES):
             box.update_box(value=ecu_param_list[9])
+        elif (box.field == Fields.RPM):
+            box.update_box(value=ECU_DATA.rpm)
         else:
             continue
         
