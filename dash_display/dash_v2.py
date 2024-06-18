@@ -88,7 +88,7 @@ class ECU_DataClass:
         self.oil_temp = float(raw) - 273.0
         
     def update_throttle_position(self, raw):
-        self.throttle_position = float(raw) / 10.0
+        self.throttle_position = int(raw) / 10
         
 
 # Field = (Title, Unit String, [Low, High])
