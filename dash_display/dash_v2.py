@@ -54,6 +54,7 @@ def try_reading():
          ECU_DATA.update_ecu_temp(ecu_param_list[8])
          ECU_DATA.update_oil_temp(ecu_param_list[5])
          ECU_DATA.update_rpm(ecu_param_list[0])
+         ECU_DATA.update_throttle_position(ecu_param_list[2])
         #  print(ECU_DATA.ecu_temp)
          
          # for x in ecu_param_list:
@@ -72,6 +73,7 @@ class ECU_DataClass:
         self.coolant_temp = 0.0
         self.rpm = 0.0
         self.oil_temp = 0.0
+        self.throttle_position = 0.0
         
     def update_ecu_temp(self, raw):
         self.ecu_temp = float(raw) / 10.0
@@ -84,6 +86,9 @@ class ECU_DataClass:
         
     def update_oil_temp(self, raw):
         self.oil_temp = float(raw) - 273.0
+        
+    def update_throttle_position(self, raw):
+        self.throttle_position = float(raw) / 10.0
         
 
 # Field = (Title, Unit String, [Low, High])
@@ -317,7 +322,7 @@ def update_func(play_forza=False):
     
     for box in boxes:
         if (box.field == Fields.THROTTLE_POS):
-            box.update_box(value=ecu_param_list[1])
+            box.update_box(value=ECU_DATA.throttle_position)
         elif (box.field == Fields.BATTERY_VOLT):
             box.update_box(value=ecu_param_list[3])
         elif (box.field == Fields.ECU_TEMP):
