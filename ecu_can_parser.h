@@ -176,6 +176,7 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     break;
     case 0x0372:
         myECU.battery = (frame[0]<<8|frame[1])/10; //This too.
+        printf("BATTERY: %f\n", myECU.battery);
         break;
 
     case 0x03E0:
