@@ -50,11 +50,12 @@ def try_reading():
         #  if len(ecu_param_list) < 11:
         #      ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
         #  print(ecu_param_list)
+        
+         ECU_DATA.update_throttle_position(ecu_param_list[2])
          ECU_DATA.update_coolant_temp(ecu_param_list[6])
          ECU_DATA.update_ecu_temp(ecu_param_list[8])
          ECU_DATA.update_oil_temp(ecu_param_list[5])
          ECU_DATA.update_rpm(ecu_param_list[0])
-         ECU_DATA.update_throttle_position(ecu_param_list[2])
         #  print(ECU_DATA.ecu_temp)
          
          # for x in ecu_param_list:
@@ -88,7 +89,8 @@ class ECU_DataClass:
         self.oil_temp = float(raw) - 273.0
         
     def update_throttle_position(self, raw):
-        self.throttle_position = int(raw) / 10
+        self.throttle_position = int(raw)
+        self.throttle_position = self.throttle_position / 10
         
 
 # Field = (Title, Unit String, [Low, High])
