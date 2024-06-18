@@ -160,6 +160,7 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
         myECU.man_pres = (frame[2]<<8|frame[3])/10;
         myECU.throttle = (frame[4]<<8|frame[5]);
         myECU.cool_pres = ((frame[6]<<8|frame[7])/10) - 101.3; 
+        printf("COOLP: %f\n", myECU.cool_pres);
         break;
         // The order of the bytes might be in the reverse order. We want to write it\
         to a csv file too so we can graph it. 
@@ -176,7 +177,6 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     break;
     case 0x0372:
         myECU.battery = (frame[0]<<8|frame[1])/10; //This too.
-        printf("BATTERY: %f\n", myECU.battery);
         break;
 
     case 0x03E0:
