@@ -47,8 +47,10 @@ def try_reading():
          data_buffer = pipe.read() #Okay this is reading properly. Fucking sexy
          ecu_param_list = data_buffer.split(',')
          
-         if len(ecu_param_list) < 11:
-             ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
+        #  if len(ecu_param_list) < 11:
+        #      ecu_param_list.extend([None] * (11 - len(ecu_param_list)))
+         
+         ECU_DATA.update_ecu_temp(ecu_param_list[7])
          
          # for x in ecu_param_list:
          #    print(x)
@@ -59,6 +61,13 @@ def try_reading():
 
 index = 0
 full_forza_data = read_forza()
+
+class ECU_DataClass:
+    def __init__(self):
+        self.ecu_temp = 0.0
+        
+    def update_ecu_temp(self, raw):
+        self.ecu_temp = float(raw) / 10.0
 
 # Field = (Title, Unit String, [Low, High])
 class Fields(Enum):
@@ -195,6 +204,8 @@ def close_app(event):
     if event.char.lower() == 'q':
         window.destroy()
         
+ECU_DATA = ECU_DataClass()
+        
 window = tk.Tk(className="Dash V2")
 window.geometry("800x480")
 window.configure(bg='black')
@@ -254,7 +265,7 @@ for box in boxes:
 
 shift_lights = ShiftLights(window, 39, 9)
 
-def update_func(play_forza=True):
+def update_func(play_forza=False):
     global full_forza_data
     global index
     # global gif_player
@@ -264,6 +275,7 @@ def update_func(play_forza=True):
         ecu_param_list = full_forza_data[index]
         index+=1
     else:
+        ecu_param_list = [0] * 11
         try_reading()
     
     rpm = int(ecu_param_list[0])
@@ -290,7 +302,7 @@ def update_func(play_forza=True):
         elif (box.field == Fields.BATTERY_VOLT):
             box.update_box(value=ecu_param_list[3])
         elif (box.field == Fields.ECU_TEMP):
-            box.update_box(value=ecu_param_list[6])
+            box.update_box(value=ECU_DATA.ecu_temp)
         elif (box.field == Fields.COOLANT_TEMP):
             box.update_box(value=ecu_param_list[7])
         elif (box.field == Fields.FUEL_PRES):
