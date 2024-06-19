@@ -456,12 +456,14 @@ static void dump_data_frames(int tty_fd)
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
         
-        if(flushCounter == FLUSH_AFTER){
-          tcflush(tty_fd, TCIFLUSH);
-          flushCounter = 0;
-        } else {
-          flushCounter++;
-        }
+        // if(flushCounter == FLUSH_AFTER){
+        //   tcflush(tty_fd, TCIFLUSH);
+        //   flushCounter = 0;
+        // } else {
+        //   flushCounter++;
+        // }
+
+        tcflush(tty_fd, TCIFLUSH);
 
       } else {
         /*printf("Unknown: ");
