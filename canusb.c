@@ -454,7 +454,7 @@ static void dump_data_frames(int tty_fd)
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
         
-	      tcflush(tty_fd, TCIFLUSH);
+	      // tcflush(tty_fd, TCIFLUSH);
       } else {
         /*printf("Unknown: ");
         for (i = 0; i <= frame_len; i++) {
