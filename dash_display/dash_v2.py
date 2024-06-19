@@ -369,6 +369,7 @@ def update_func(play_forza=False):
     window.after(1, update_func)
 
 window.attributes("-fullscreen", True)
+window.attributes("-type", "splash")
 window.after(1, update_func)
 # window.after(1, update_gif, ind)
 window.mainloop()
