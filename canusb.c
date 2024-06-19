@@ -20,6 +20,7 @@
 
 #define CANUSB_INJECT_SLEEP_GAP_DEFAULT 200 /* ms */
 #define CANUSB_TTY_BAUD_RATE_DEFAULT 2000000
+#define FLUSH_AFTER                 10
 
 typedef enum {
   CANUSB_SPEED_1000000 = 0x01,
@@ -61,6 +62,7 @@ static int program_running = 1;
 static int inject_payload_mode = CANUSB_INJECT_PAYLOAD_MODE_FIXED;
 static float inject_sleep_gap = CANUSB_INJECT_SLEEP_GAP_DEFAULT;
 static int print_traffic = 0;
+int flushCounter = 0;
 
 
 
@@ -454,7 +456,13 @@ static void dump_data_frames(int tty_fd)
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
         
-	      // tcflush(tty_fd, TCIFLUSH);
+        if(flushCounter == FLUSH_AFTER){
+          tcflush(tty_fd, TCIFLUSH);
+          flushCounter = 0;
+        } else {
+          flushCounter++;
+        }
+
       } else {
         /*printf("Unknown: ");
         for (i = 0; i <= frame_len; i++) {
