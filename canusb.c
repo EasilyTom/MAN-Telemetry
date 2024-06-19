@@ -445,11 +445,11 @@ static void dump_data_frames(int tty_fd)
       if ((frame_len >= 6) &&
           (frame[0] == 0xaa) &&
           ((frame[1] >> 4) == 0xc)) {
-        printf("Frame ID: %02x%02x, Data: ", frame[3], frame[2]);
-        for (i = frame_len - 2; i > 3; i--) {
-         printf("%02x ", frame[i]);
-        }
-        printf("\n"); // Right now we would like to see the data frame for debugging
+        // printf("Frame ID: %02x%02x, Data: ", frame[3], frame[2]);
+        // for (i = frame_len - 2; i > 3; i--) {
+        //  printf("%02x ", frame[i]);
+        // }
+        // printf("\n"); // Right now we would like to see the data frame for debugging
 
         frame_id = frame[3]<<8|frame[2];
         ecu_parse_and_print(frame_id, &frame[4], frame_len - 2);
