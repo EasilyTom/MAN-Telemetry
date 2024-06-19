@@ -150,7 +150,7 @@ int ecu_write_to_csv(void){
 /// @param frame_len Length of received data 
 void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     // write_pipe_test();
-    if(ID == 0x0372|| ID == 0x0361)fprintf(stdout, "ID: %x\n", ID);
+    // if(ID == 0x0372|| ID == 0x0361)fprintf(stdout, "ID: %x\n", ID);
     if(frame_len < 8) return; //If the frame length is too small it will return
    
     
