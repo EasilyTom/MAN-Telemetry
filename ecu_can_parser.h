@@ -217,6 +217,9 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     // else{
     //     iter_num ++;
     // }
+
+    fflush(stdout);
+
     return;
     
 }
