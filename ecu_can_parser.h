@@ -158,7 +158,7 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     case 0x0360:
         myECU.rpm = frame[0]<<8|frame[1]; //This might need to be looked at once
         myECU.man_pres = (frame[2]<<8|frame[3])/10;
-        myECU.throttle = (frame[4]<<8|frame[5])/10;
+        myECU.throttle = (frame[4]<<8|frame[5]);
         myECU.cool_pres = ((frame[6]<<8|frame[7])/10) - 101.3; 
         break;
         // The order of the bytes might be in the reverse order. We want to write it\
