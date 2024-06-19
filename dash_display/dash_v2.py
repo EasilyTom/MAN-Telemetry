@@ -56,10 +56,10 @@ def try_reading():
          ECU_DATA.update_ecu_temp(ecu_param_list[8])
          ECU_DATA.update_oil_temp(ecu_param_list[5])
          ECU_DATA.update_rpm(ecu_param_list[0])
-        #  print(ECU_DATA.ecu_temp)
+         ECU_DATA.update_battery_voltage(ecu_param_list[1])
+         ECU_DATA.update_oil_pressure(ecu_param_list[4])
+         ECU_DATA.update_fuel_pressure(ecu_param_list[7])
          
-         # for x in ecu_param_list:
-         #    print(x)
    except FileNotFoundError:
       print("Named pipe does not exist!")
    except OSError as e:
@@ -75,6 +75,9 @@ class ECU_DataClass:
         self.rpm = 0.0
         self.oil_temp = 0.0
         self.throttle_position = 0.0
+        self.battery_voltage = 0.0
+        self.fuel_pressure = 0.0
+        self.oil_pressure = 0.0
         
     def update_ecu_temp(self, raw):
         self.ecu_temp = float(raw) / 10.0
@@ -90,9 +93,16 @@ class ECU_DataClass:
         
     def update_throttle_position(self, raw):
         self.throttle_position = int(raw)
-        self.throttle_position = self.throttle_position / 10
+    
+    def update_battery_voltage(self, raw):
+        self.battery_voltage = float(raw)
         
-
+    def update_oil_pressure(self, raw):
+        self.oil_pressure = float(raw)
+    
+    def update_fuel_pressure(self, raw):
+        self.fuel_pressure = float(raw)
+    
 # Field = (Title, Unit String, [Low, High])
 class Fields(Enum):
     THROTTLE_POS = ("THROTTLE POSITION", "%", [20, 90])
@@ -326,15 +336,15 @@ def update_func(play_forza=False):
         if (box.field == Fields.THROTTLE_POS):
             box.update_box(value=ECU_DATA.throttle_position)
         elif (box.field == Fields.BATTERY_VOLT):
-            box.update_box(value=ecu_param_list[3])
+            box.update_box(value=ECU_DATA.battery_voltage)
         elif (box.field == Fields.ECU_TEMP):
             box.update_box(value=ECU_DATA.ecu_temp)
         elif (box.field == Fields.COOLANT_TEMP):
             box.update_box(value=ECU_DATA.coolant_temp)
         elif (box.field == Fields.FUEL_PRES):
-            box.update_box(value=ecu_param_list[8])
+            box.update_box(value=ECU_DATA.fuel_pressure)
         elif (box.field == Fields.OIL_PRES):
-            box.update_box(value=ecu_param_list[9])
+            box.update_box(value=ECU_DATA.oil_pressure)
         elif (box.field == Fields.RPM):
             box.update_box(value=ECU_DATA.rpm)
         elif (box.field == Fields.OIL_TEMP):
