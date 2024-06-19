@@ -20,7 +20,7 @@
 
 #define CANUSB_INJECT_SLEEP_GAP_DEFAULT 200 /* ms */
 #define CANUSB_TTY_BAUD_RATE_DEFAULT 2000000
-#define FLUSH_AFTER                 10
+#define FLUSH_AFTER                 3
 
 typedef enum {
   CANUSB_SPEED_1000000 = 0x01,
