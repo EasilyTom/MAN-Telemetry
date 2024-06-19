@@ -60,6 +60,7 @@ def try_reading():
              ECU_DATA.update_battery_voltage(ecu_param_list[1])
              ECU_DATA.update_oil_pressure(ecu_param_list[4])
              ECU_DATA.update_fuel_pressure(ecu_param_list[7])
+             ECU_DATA.update_speed(ecu_param_list[3])
          except:
              pass
         #  print(ECU_DATA.ecu_temp)
@@ -84,6 +85,7 @@ class ECU_DataClass:
         self.battery_voltage = 0.0
         self.oil_pressure = 0.0
         self.fuel_pressure = 0.0
+        self.speed = 0.0
         
     def update_ecu_temp(self, raw):
         self.ecu_temp = float(raw) - 273
@@ -93,6 +95,9 @@ class ECU_DataClass:
         
     def update_rpm(self, raw):
         self.rpm = int(raw)
+    
+    def update_speed(self, raw):
+        self.speed = int(raw)
         
     def update_oil_temp(self, raw):
         self.oil_temp = float(raw) - 273.0
@@ -337,7 +342,7 @@ def update_func(play_forza=False):
     gear = ecu_param_list[4]
     
     gear_indicator.config(text=gear)
-    speed_indicator.config(text=speed)
+    speed_indicator.config(text=ECU_DATA.speed)
     
     for box in boxes:
         if (box.field == Fields.THROTTLE_POS):
