@@ -149,9 +149,9 @@ int ecu_write_to_csv(void){
 /// @param frame Data bytes received on CAN
 /// @param frame_len Length of received data 
 void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
-    write_pipe_test();
+    // write_pipe_test();
     if(frame_len < 8) return; //If the frame length is too small it will return
-    
+    if(ID == 0x0372|| ID == 0x0361)fprintf(stdout, "ID: %x\n", ID);
     
     switch (ID)
     {
@@ -205,17 +205,17 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     }
      
     write_pipe(&myECU);
-    if(iter_num == PRINT_AFTER){
-        iter_num = 0;
-            // printf("\nRPM: %u Throttle: %u \n Battery: %f",myECU.rpm,  myECU.throttle, myECU.battery); 
-	        // system("clear");
-        if(ecu_write_to_csv()){
-           printf("Write operation failed");
-        }
-    }
-    else{
-        iter_num ++;
-    }
+    // if(iter_num == PRINT_AFTER){
+    //     iter_num = 0;
+    //         // printf("\nRPM: %u Throttle: %u \n Battery: %f",myECU.rpm,  myECU.throttle, myECU.battery); 
+	//         // system("clear");
+    //     if(ecu_write_to_csv()){
+    //        printf("Write operation failed");
+    //     }
+    // }
+    // else{
+    //     iter_num ++;
+    // }
     return;
     
 }
