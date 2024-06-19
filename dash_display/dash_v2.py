@@ -92,7 +92,7 @@ class ECU_DataClass:
         self.throttle_position = 0.0
         
     def update_ecu_temp(self, raw):
-        self.ecu_temp = float(raw) / 10.0
+        self.ecu_temp = float(raw) - 273
     
     def update_coolant_temp(self, raw):
         self.coolant_temp = float(raw) - 273.0
