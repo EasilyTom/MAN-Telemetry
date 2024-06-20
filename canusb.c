@@ -534,6 +534,7 @@ static void display_help(const char *progname)
 
 static void sigterm(int signo)
 {
+  clean_shared_memory();
   program_running = 0;
 }
 

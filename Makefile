@@ -1,11 +1,9 @@
 default:
 	echo "Please specify build file"
-can:
-	gcc -o mod_canusb canusb.c
 
-display: 
-	rm display\
-	gcc -o display display.c -lGL -lGLU -lglut -lm
+## Compilies all binaries and links them to mod_canusb
+can:
+	gcc -o mod_canusb canusb.c ecu_can_parser.c ecu_can_parser.h -lpthread
 .PHONY:clean
 clean:
 	rm mod_canusb display
