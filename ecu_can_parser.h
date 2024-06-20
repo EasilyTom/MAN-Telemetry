@@ -44,20 +44,30 @@ struct ECU{
 /// @brief Write data to the named pipe.
 /// @param somedata Data structure containing all the data
 /// @return Nothing right now. Need to add error checks
-void write_data(struct ECU * somedata);
+void send_data_to_dash(struct ECU * somedata);
 
 /// @brief Test function to write data to the named pipe
 /// @param  
 void write_pipe_test(void);
 
+
+/// @brief Writes data to the named pipe.
+/// @param buffer Sting to be written to the shared memory
+/// @param size Size of the string
+/// @return 0 on Success and 1 on failure
 int write_to_pipe(char* buffer, int size);
 
+
+/// @brief Creates semaphore and shared memory instances to write to 
+/// @return 0 on success and 1 on failure
 int init_shared_memory(void);
 
-/// @brief Instead of writing to a named pipe, write to shared memory. This should be faster than the named pipe
-/// @param somedata Data structure containing all the data
+/// @brief Instead of writing to a named pipe, write to shared memory. This should be faster than the 
+///        named pipe. It will not write to the shared mempry if it cannot acquire the semaphore needed
+/// @param buffer Sting to be written to the shared memory
+/// @param size Size of the string
 /// @return 0 on Success and 1 on a failure
-int write_to_shared_memory(char * buffer, int size);
+void write_to_shared_memory(char * buffer, int size);
 
 /// @brief Empties the old written csv file or creates one if it does not exist
 /// @param  

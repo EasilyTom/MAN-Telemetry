@@ -29,7 +29,7 @@ struct testData{
 
 /// @brief Write data to the named pipe.
 /// @param somedata Data structure containing all the data
-void write_data(struct testData * somedata){
+void send_data_to_dash(struct testData * somedata){
     char buffer[200];
     memset(buffer, 0x00, 200);
     int written_size = sprintf(buffer,"%d,%d,%d,%d", somedata->rpm, somedata->battery, somedata->something_else, somedata->throttle);
@@ -69,7 +69,7 @@ int main(){
             else{
                 myData.rpm += 100;
             }
-            write_data(&myData); 
+            send_data_to_dash(&myData); 
             usleep(50000);
     }
 

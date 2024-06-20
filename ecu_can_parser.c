@@ -42,7 +42,7 @@ char *shmPtr;
 
 //////////////////////////////// FUNCTIONS //////////////////////////////////
 
-void write_data(struct ECU * somedata){
+void send_data_to_dash(struct ECU * somedata){
     char buffer[256];
     memset(buffer, 0x00, 256);
     /*
@@ -73,7 +73,7 @@ void write_data(struct ECU * somedata){
     );
     // Memory copy is more annoying in python. Therefore, we write string data and not raw data here
     
-    // fflush(PIPE_PATH); //This is not needed with named pipes
+    
     // write_to_pipe(buffer, written_size);
     write_to_shared_memory(buffer, written_size);
 
@@ -140,12 +140,14 @@ int init_shared_memory(void){
 }
 
 
-int write_to_shared_memory(char * buffer, int size){
+void write_to_shared_memory(char * buffer, int size){
 
 
     if(sem_wait(ecuDataSem) == -1){
-        perror("sem_wait");
-        return EXIT_FAILURE;
+        // Skips writing if semaphore cannot be acquired    
+        // Can be replaced with sem_timedwait, which will wait for some time 
+        // before giving up. If this breaks, use that instead.
+        return;
     }
     
 
@@ -153,9 +155,6 @@ int write_to_shared_memory(char * buffer, int size){
     
     
     sem_post(ecuDataSem);
-
-
-    return EXIT_SUCCESS;
 }
 
 void clean_shared_memory(void){
@@ -277,18 +276,8 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
         break;
     }
      
-    write_data(&myECU);
-    if(iter_num == PRINT_AFTER){
-        iter_num = 0;
-            // printf("\nRPM: %u Throttle: %u \n Battery: %f",myECU.rpm,  myECU.throttle, myECU.battery); 
-	        // system("clear");
-        if(ecu_write_to_csv()){
-           printf("Write operation failed");
-        }
-    }
-    else{
-        iter_num ++;
-    }
+    send_data_to_dash(&myECU);
+    
     return;
     
 }
