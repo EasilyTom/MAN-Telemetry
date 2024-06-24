@@ -10,6 +10,7 @@
 #include <time.h>           
 #include <sys/mman.h>
 #include <semaphore.h>
+#include <errno.h>
 #include <pthread.h>
 
 
@@ -34,7 +35,6 @@ int iter_num = 0;
 
 key_t key;
 int shmid;
-char *shmPtr;
 
 sem_t *ecuDataSem;
 char *shmPtr;
@@ -79,8 +79,25 @@ void send_data_to_dash(struct ECU * somedata){
 
 }
 
+/////////////////////////////// PIPE FUNCTIONS ///////////////////////////////
+
+int init_pipe(void){
+    if(mkfifo(PIPE_PATH, 0666) == -1){
+        if (errno == EEXIST) {
+            // Pipe already exists, consider it a success
+            return EXIT_SUCCESS;
+        } else {
+            // An error other than the pipe existing occurred
+            perror("Failed to create named pipe");
+            return EXIT_FAILURE;
+        }
+    }   
+    return 0;
+
+}
+
 int write_to_pipe(char* buffer, int size){
-    int fd = open(PIPE_PATH, O_WRONLY);
+    int fd = open(PIPE_PATH, O_RDWR | O_NONBLOCK);
     if(fd == -1){
         return EXIT_FAILURE;
     }
@@ -88,6 +105,27 @@ int write_to_pipe(char* buffer, int size){
         return EXIT_FAILURE;
     }
     close(fd);
+    return 0;
+}
+
+int read_from_pipe(char* buffer, int size){
+    int fd = open(PIPE_PATH, O_RDONLY|O_NONBLOCK);
+    if(fd == -1){
+        return EXIT_FAILURE;
+    }
+    if(read(fd , buffer, size) == -1){
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    close(fd);
+    return EXIT_SUCCESS;
+}
+
+int clean_pipe(void){
+    if(unlink(PIPE_PATH) == -1){
+        perror("Pipe unlinking failed");
+        return EXIT_FAILURE;
+    }
     return 0;
 }
 
@@ -105,6 +143,7 @@ void write_pipe_test(void){
 }
 
 
+/////////////////////////////// SHARED MEMORY FUNCTIONS ///////////////////////
 int init_shared_memory(void){
     // Creating the shared memory object
     int sharedMemory = shm_open(SHARMEMNAME, O_CREAT | O_RDWR, 0644);
@@ -127,6 +166,8 @@ int init_shared_memory(void){
         return EXIT_FAILURE;
     }
 
+    munmap(shmPtr, SHARMEMSIZE);
+
     close(sharedMemory);
 
     ecuDataSem = sem_open(SEMNAME, O_CREAT, 0644, 1);
@@ -140,49 +181,99 @@ int init_shared_memory(void){
 }
 
 
-void write_to_shared_memory(char * buffer, int size){
+int write_to_shared_memory(char * buffer, int size){
 
 
     if(sem_wait(ecuDataSem) == -1){
         // Skips writing if semaphore cannot be acquired    
         // Can be replaced with sem_timedwait, which will wait for some time 
         // before giving up. If this breaks, use that instead.
-        return;
+        return 0;
     }
     
+    // Open shared memory
+
+    int sharedMemory = shm_open(SHARMEMNAME, O_RDWR, 0644);
+    if(sharedMemory == -1){
+        perror("shm_open while writing\n");
+        return EXIT_FAILURE;
+    }
+
+    shmPtr = mmap(0, SHARMEMSIZE, PROT_WRITE, MAP_SHARED, sharedMemory, 0);
+    if(shmPtr == MAP_FAILED){
+        perror("mmap while writing\n");
+        return EXIT_FAILURE;
+    }
 
     strncpy(shmPtr, buffer, size);
     
+    munmap(shmPtr, SHARMEMSIZE);
+    close(sharedMemory);
+    
+    if(sem_post(ecuDataSem)== -1){
+        perror("sem_post\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
+int read_from_shared_memory(char * buffer, int size){
+    
+    if(sem_wait(ecuDataSem) == -1){
+        // Skips writing if semaphore cannot be acquired    
+        // Can be replaced with sem_timedwait, which will wait for some time 
+        // before giving up. If this breaks, use that instead.
+        return 0;
+    }
+    
+    // Open shared memory
+
+    int sharedMemory = shm_open(SHARMEMNAME, O_RDONLY, 0644);
+    if(sharedMemory == -1){
+        perror("shm_open while reading\n");
+        return EXIT_FAILURE;
+    }
+
+    shmPtr = mmap(0, SHARMEMSIZE, PROT_READ, MAP_SHARED, sharedMemory, 0);
+    if(shmPtr == MAP_FAILED){
+        perror("mmap while reading\n");
+        return EXIT_FAILURE;
+    }
+    
+    strncpy(buffer, shmPtr, size);
+
+
+
+    munmap(shmPtr, SHARMEMSIZE);
+    close(sharedMemory);
     
     sem_post(ecuDataSem);
 }
 
-void clean_shared_memory(void){
-    munmap(shmPtr, SHARMEMSIZE);
-    sem_close(ecuDataSem);
-    sem_unlink(SEMNAME);
-    shm_unlink(SHARMEMNAME);
-
-     if (munmap(shmPtr, SHARMEMSIZE) == -1) {
-        perror("munmap");
-    }
-
+int clean_shared_memory(void){
+    
     // Close and unlink semaphore
     if (sem_close(ecuDataSem) == -1) {
-        perror("sem_close");
+        perror("sem_close cleaining\n");
+        return EXIT_FAILURE;
     }
     // Removes the semaphore
     if (sem_unlink(SEMNAME) == -1) {
-        perror("sem_unlink");
+        perror("sem_unlink cleaining\n");
+        return EXIT_FAILURE;
     }
 
     // Unlink shared memory
     if (shm_unlink(SHARMEMNAME) == -1) {
-        perror("shm_unlink");
+        perror("shm_unlink cleaining\n");
+        return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
 }   
 
-
+/////////////////////////////// CSV FUNCTIONS ////////////////////////////////
 int init_csv_file(void){
     FILE *fptr;
 
@@ -217,7 +308,6 @@ int ecu_write_to_csv(void){
     fclose(fptr);
     return 0;
 }
-
 
 void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len){
     write_pipe_test();

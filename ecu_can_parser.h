@@ -50,6 +50,9 @@ void send_data_to_dash(struct ECU * somedata);
 /// @param  
 void write_pipe_test(void);
 
+/// @brief Initializes the named pipe
+/// @return 0 on success and 1 on failure
+int init_pipe(void);
 
 /// @brief Writes data to the named pipe.
 /// @param buffer Sting to be written to the shared memory
@@ -57,6 +60,15 @@ void write_pipe_test(void);
 /// @return 0 on Success and 1 on failure
 int write_to_pipe(char* buffer, int size);
 
+/// @brief Reads data from the named pipe
+/// @param buffer buffer to read the memory to
+/// @param size Size of data to be read
+/// @return 0 on success and 1 on failure
+int read_from_pipe(char* buffer, int size);
+
+/// @brief Cleans the named pipe
+/// @return 0 on success and 1 on failure
+int clean_pipe(void);
 
 /// @brief Creates semaphore and shared memory instances to write to 
 /// @return 0 on success and 1 on failure
@@ -66,8 +78,14 @@ int init_shared_memory(void);
 ///        named pipe. It will not write to the shared mempry if it cannot acquire the semaphore needed
 /// @param buffer Sting to be written to the shared memory
 /// @param size Size of the string
-/// @return 0 on Success and 1 on a failure
-void write_to_shared_memory(char * buffer, int size);
+/// @return 0 on success and 1 on a failure
+int write_to_shared_memory(char * buffer, int size);
+
+/// @brief Reads data from the shared memory
+/// @param buffer buffer to read the memory to
+/// @param size Size of data to be read
+/// @return 0 on success and 1 on failure
+int read_from_shared_memory(char * buffer, int size);
 
 /// @brief Empties the old written csv file or creates one if it does not exist
 /// @param  
@@ -87,7 +105,7 @@ void ecu_parse_and_print(uint16_t ID, char * frame, int frame_len);
 
 /// @brief Cleans shared memory and associated semaphores
 /// @param  
-void clean_shared_memory(void);
+int clean_shared_memory(void);
 
 
 #endif

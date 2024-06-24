@@ -1,2 +1,4 @@
 .vscode
 .venv
+ecu_data.csv
+fake_data.c
